@@ -1,9 +1,10 @@
-import { Row, Col, Stack, Button, Form } from "react-bootstrap";
+import { Row, Col, Stack, Button, Form, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactSelect from "react-select";
 import { useState, useMemo } from "react";
 import { Note, Tag } from "../App";
 import NoteCard from "./note-card.component";
+import { EditTagsModal } from "./edit-tags.component";
 
 export type SimplifiedNote = {
   tags: Tag[];
@@ -19,6 +20,7 @@ type NoteListProps = {
 const NoteList = ({ availableTags, notes }: NoteListProps) => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [title, setTitle] = useState("");
+  const [editTagsModalIsOpen, setEditTagsModalIsOpen] = useState(false);
 
   const filteredNotes = useMemo(() => {
     return notes.filter((note) => {
@@ -44,7 +46,12 @@ const NoteList = ({ availableTags, notes }: NoteListProps) => {
             <Link to="new">
               <Button variant="primary">Create</Button>
             </Link>
-            <Button variant="outline-secondary">Edit Tags</Button>
+            <Button
+              onClick={() => setEditTagsModalIsOpen(true)}
+              variant="outline-secondary"
+            >
+              Edit Tags
+            </Button>
           </Stack>
         </Col>
       </Row>
@@ -93,6 +100,12 @@ const NoteList = ({ availableTags, notes }: NoteListProps) => {
           </Col>
         ))}
       </Row>
+
+      <EditTagsModal
+        show={editTagsModalIsOpen}
+        handleClose={() => setEditTagsModalIsOpen(false)}
+        availableTags={availableTags}
+      />
     </>
   );
 };
