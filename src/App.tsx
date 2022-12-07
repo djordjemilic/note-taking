@@ -6,6 +6,9 @@ import { useLocalStorage } from "./useLocalStorage";
 import { useMemo } from "react";
 import { v4 as uuidV4 } from "uuid";
 import NoteList from "./components/note-list.component";
+import NoteLayout from "./components/note-layout.component";
+import Note from "./components/note.component";
+import EditNote from "./components/edit-note.component";
 
 export type Note = {
   id: string;
@@ -58,6 +61,22 @@ function App() {
     setTags((prev) => [...prev, tag]);
   }
 
+  function onUpdateNote(id: string, { tags, ...data }: NoteData) {
+    setNotes((prevNotes) => {
+      return prevNotes.map((note) => {
+        if (note.id === id) {
+          return {
+            ...note,
+            ...data,
+            tagsIds: tags.map((tag) => tag.id),
+          };
+        } else {
+          return note;
+        }
+      });
+    });
+  }
+
   return (
     <Container className="my-4 ">
       <Routes>
@@ -75,9 +94,18 @@ function App() {
             />
           }
         />
-        <Route path="/:id">
-          <Route index element={<h1>Show</h1>} />
-          <Route path="edit" element={<h1>Edit</h1>} />
+        <Route path="/:id" element={<NoteLayout notes={notesWithTags} />}>
+          <Route index element={<Note />} />
+          <Route
+            path="edit"
+            element={
+              <EditNote
+                onSubmit={onUpdateNote}
+                onAddTag={addTag}
+                availableTags={tags}
+              />
+            }
+          />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
